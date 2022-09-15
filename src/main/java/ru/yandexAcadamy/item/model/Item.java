@@ -1,0 +1,36 @@
+package ru.yandexAcadamy.item.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@Setter
+@ToString
+@Table(name = "items")
+public class Item {
+    // Уникальный идентификатор
+    @Id
+    private String id;
+
+    // Ссылка на файл. Для папок поле равно null.
+    private String url;
+
+    // Время последнего обновления элемента.
+    private LocalDateTime date;
+
+    // id родительской папки
+    @Column(name = "parent_id")
+    private String parentId;
+
+    // Тип элемента - папка или файл
+    @Enumerated(EnumType.STRING)
+    private Type type;
+
+    // Целое число, для папки - это суммарный размер всех элементов.
+    private Integer size;
+}
