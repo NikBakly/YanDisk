@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.yandexAcadamy.item.model.Type;
 
-import java.time.LocalDateTime;
-
 @Builder
 @Setter
 @Getter
@@ -16,5 +14,5 @@ public class SystemItemHistoryUnit {
     private String parentId;
     private Type type;
     private Integer size;
-    private LocalDateTime date;
+    private String date;
 }

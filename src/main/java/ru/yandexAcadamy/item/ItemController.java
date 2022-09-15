@@ -34,7 +34,6 @@ public class ItemController {
         return itemService.findItemById(itemId);
     }
 
-    //todo вторая часть - дополнительные баллы
 
     @GetMapping("/updates")
     public List<SystemItemHistoryUnit> findUpdatedItems(@RequestParam(name = "date") String date) {

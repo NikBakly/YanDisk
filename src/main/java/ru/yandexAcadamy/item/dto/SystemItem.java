@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.yandexAcadamy.item.model.Type;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -14,7 +13,7 @@ import java.util.List;
 public class SystemItem {
     private String id;
     private String url;
-    private LocalDateTime date;
+    private String date;
     private String parentId;
     private Type type;
     private Integer size;

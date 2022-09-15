@@ -34,7 +34,6 @@ public class ItemServiceImpl implements ItemService {
         for (SystemItemImport systemItemImport : systemItemImportRequest.getItems()) {
             Optional<Item> item = itemRepository.findById(systemItemImport.getId());
             validateWhenImporting(item, systemItemImport, systemItemImportRequest.getUpdateDate());
-            LocalDateTime updateDate = LocalDateTime.parse(systemItemImportRequest.getUpdateDate(), formatter);
             if (systemItemImport.getParentId() != null) {
                 if (systemItemImport.getType().equals(Type.FILE)) {
                     //разница между новым размером и старым.
@@ -47,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
                     } else {
                         differenceSizes = systemItemImport.getSize();
                     }
-                    updateSizeOrDateParentByParentId(systemItemImport.getParentId(), differenceSizes, updateDate);
+                    updateSizeOrDateParentByParentId(systemItemImport.getParentId(), differenceSizes, systemItemImportRequest.getUpdateDate());
                 }
             }
             if (item.isPresent()) {
@@ -56,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
                 log.info("Successful importing item id={}", systemItemImport.getId());
             }
             //Сохраняем элемент
-            Item resultItem = itemRepository.save(ItemMapper.toItem(systemItemImport, updateDate));
+            Item resultItem = itemRepository.save(ItemMapper.toItem(systemItemImport, systemItemImportRequest.getUpdateDate()));
             //Записываем в историю
             itemHistoryRepository.save(ItemMapper.toItemHistory(resultItem));
         }
@@ -70,9 +69,10 @@ public class ItemServiceImpl implements ItemService {
             log.warn("Date does not fit the ISO 8601 format");
             throw new BadRequestException();
         }
-        String parentId = itemRepository.findById(itemId).get().getParentId();
+        Item item = itemRepository.findById(itemId).get();
+        String parentId = item.getParentId();
         if (parentId != null) {
-            updateSizeOrDateParentByParentId(parentId, 0, LocalDateTime.parse(updateDate, formatter));
+            updateSizeOrDateParentByParentId(parentId, item.getSize() * -1, updateDate);
         }
         log.info("Successful delete item id={}", itemId);
         deleteItemById(itemId);
@@ -94,8 +94,7 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException();
         }
         List<Item> updatedItems = itemRepository
-                .findAllByTypeAndDateBetween(Type.FILE,
-                        LocalDateTime.parse(date, formatter).minusHours(24),
+                .findAllFolderAndDateBetween(LocalDateTime.parse(date, formatter).minusHours(24),
                         LocalDateTime.parse(date, formatter));
         return ItemMapper.toSystemItemsHistoryUnitFromItem(updatedItems);
     }
@@ -116,8 +115,8 @@ public class ItemServiceImpl implements ItemService {
             }
             return ItemMapper.toSystemItemHistoryResponse(itemHistoryRepository
                     .findAllByIdAndDateIsBetween(itemId,
-                            LocalDateTime.parse(dateStart, formatter),
-                            LocalDateTime.parse(dateEnd, formatter)));
+                            dateStart,
+                            dateEnd));
         }
         return ItemMapper.toSystemItemHistoryResponse(itemHistoryRepository.findAllById(itemId));
     }
@@ -186,7 +185,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     // метод обновляет размер и дату папки, в которой случилось изменение, если она существует
-    private void updateSizeOrDateParentByParentId(String parentId, int differenceInSize, LocalDateTime updateDate) {
+    private void updateSizeOrDateParentByParentId(String parentId, int differenceInSize, String updateDate) {
         if (parentId != null) {
             Optional<Item> parentItem = itemRepository.findById(parentId);
             // проверка на существование родителя
@@ -222,7 +221,7 @@ public class ItemServiceImpl implements ItemService {
     // метод для проверки существования элемента
     private void checkItemId(String itemId) {
         if (itemRepository.findById(itemId).isEmpty()) {
-            log.warn("Элемент itemId={} не найден", itemId);
+            log.warn("Item by id={} not found", itemId);
             throw new NotFoundException();
         }
     }

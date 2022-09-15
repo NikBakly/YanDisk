@@ -11,14 +11,14 @@ import java.util.Map;
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleBadRequestException() {
+    public Map<String, String> handleBadRequestException(final BadRequestException e) {
         return Map.of("code", "400",
                 "message", "Validation Failed");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFound() {
+    public Map<String, String> handleNotFound(final NotFoundException e) {
         return Map.of("code", "404",
                 "message", "Item not found");
     }

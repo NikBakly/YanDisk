@@ -8,14 +8,13 @@ import ru.yandexAcadamy.item.dto.SystemItemImport;
 import ru.yandexAcadamy.item.model.Item;
 import ru.yandexAcadamy.item.model.ItemHistory;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ItemMapper {
 
-    public static Item toItem(SystemItemImport systemItemImportRequest, LocalDateTime updateDate) {
+    public static Item toItem(SystemItemImport systemItemImportRequest, String updateDate) {
         Item item = new Item();
         item.setId(systemItemImportRequest.getId());
         item.setUrl(systemItemImportRequest.getUrl());

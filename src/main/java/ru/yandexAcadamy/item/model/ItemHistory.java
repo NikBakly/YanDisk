@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -26,7 +25,7 @@ public class ItemHistory {
     private String url;
 
     // Время последнего обновления элемента.
-    private LocalDateTime date;
+    private String date;
 
     // id родительской папки
     @Column(name = "parent_id")

@@ -1,9 +1,10 @@
 package ru.yandexAcadamy.item;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import ru.yandexAcadamy.item.model.ItemHistory;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemHistoryRepository extends CrudRepository<ItemHistory, Long> {
@@ -13,10 +14,12 @@ public interface ItemHistoryRepository extends CrudRepository<ItemHistory, Long>
 
     List<ItemHistory> findAllById(String itemId);
 
-
-    List<ItemHistory> findAllByIdAndDateIsBetween(String itemId,
-                                                  LocalDateTime date_start,
-                                                  LocalDateTime date_end);
+    @Query("select ih from ItemHistory as ih" +
+            " where ih.id = :id " +
+            " and cast(ih.date as timestamp) between cast(:date_start as timestamp ) and cast(:date_end as timestamp )")
+    List<ItemHistory> findAllByIdAndDateIsBetween(@Param("id") String itemId,
+                                                  @Param("date_start") String dateStart,
+                                                  @Param("date_end") String dateEnd);
 
 
 }
